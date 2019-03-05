@@ -1,0 +1,401 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        04/03/2018  17:22:23  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE main.obj TO ADF435X RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL WITH FLOATING POINT ARITHMETIC
+
+
+INPUT MODULES INCLUDED:
+  main.obj (MAIN)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?FPADD)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?FPMUL)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?FPDIV)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?FCAST)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?CASTF)
+  C:\KEIL\C51\LIB\C51FPS.LIB (?C?FPGETOPN)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?CLDPTR)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?CLDOPTR)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?LNEG)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?ULCMP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C?LSHL)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  ADF435X (MAIN)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0045H     UNIT         ?DT?MAIN
+            DATA    004DH     002AH     UNIT         _DATA_GROUP_
+            DATA    0077H     0003H     UNIT         ?DT?_SERIAL_ONE_SEND_STRING?MAIN
+            DATA    007AH     0003H     UNIT         ?DT?_SERIAL_ONE_SEND_LENGTH_STRING?MAIN
+            IDATA   007DH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     001BH     UNIT         ?PR?_DELAYMS?MAIN
+            CODE    001EH     0004H     UNIT         ?C_INITSEG
+                    0022H     0001H                  *** GAP ***
+            CODE    0023H     0003H     ABSOLUTE     
+            CODE    0026H     03D5H     UNIT         ?C?LIB_CODE
+            CODE    03FBH     02C6H     UNIT         ?PR?_WRITEFREQ?MAIN
+            CODE    06C1H     00A8H     UNIT         ?PR?MAIN?MAIN
+            CODE    0769H     008CH     UNIT         ?C_C51STARTUP
+            CODE    07F5H     006DH     UNIT         ?PR?_WRITETOADF435X?MAIN
+            CODE    0862H     0028H     UNIT         ?PR?UART1_INT?MAIN
+            CODE    088AH     0025H     UNIT         ?PR?SERIAL_ONE_INIT?MAIN
+            CODE    08AFH     0025H     UNIT         ?PR?_SERIAL_ONE_SEND_STRING?MAIN
+            CODE    08D4H     0023H     UNIT         ?PR?_SERIAL_ONE_SEND_LENGTH_STRING?MAIN
+            CODE    08F7H     000FH     UNIT         ?PR?DELAY10MS?MAIN
+            CODE    0906H     0008H     UNIT         ?PR?_SERIAL_ONE_SEND_BYTE?MAIN
+            CODE    090EH     0003H     UNIT         ?PR?_DELAYUS2X?MAIN
+
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 2
+
+
+
+OVERLAY MAP OF MODULE:   ADF435X (MAIN)
+
+
+SEGMENT                                           DATA_GROUP 
+  +--> CALLED SEGMENT                           START    LENGTH
+---------------------------------------------------------------
+?C_C51STARTUP                                   -----    -----
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN                                   -----    -----
+  +--> ?PR?_DELAYMS?MAIN
+  +--> ?PR?_WRITETOADF435X?MAIN
+  +--> ?PR?DELAY10MS?MAIN
+  +--> ?PR?SERIAL_ONE_INIT?MAIN
+  +--> ?PR?_WRITEFREQ?MAIN
+
+?PR?_DELAYMS?MAIN                               -----    -----
+  +--> ?PR?_DELAYUS2X?MAIN
+
+?PR?_WRITETOADF435X?MAIN                        006DH    000AH
+
+?PR?_WRITEFREQ?MAIN                             004DH    0020H
+  +--> ?PR?_WRITETOADF435X?MAIN
+
+
+
+SYMBOL TABLE OF MODULE:  ADF435X (MAIN)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  D:00C0H         PUBLIC        P4
+  D:00C8H         PUBLIC        P5
+  B:00A8H.7       PUBLIC        EA
+  D:00A2H         PUBLIC        P_SW1
+  D:00A8H         PUBLIC        IE
+  B:00A0H.2       PUBLIC        LE
+  C:07FDH         PUBLIC        _WriteToADF435X
+  C:08D4H         PUBLIC        _serial_one_send_length_string
+  B:00A8H.4       PUBLIC        ES
+  D:00B8H         PUBLIC        IP
+  B:0090H.2       PUBLIC        DATA
+  B:0098H.0       PUBLIC        RI
+  C:0862H         PUBLIC        UART1_int
+  B:0098H.1       PUBLIC        TI
+  C:03FBH         PUBLIC        _WriteFreq
+  B:00B8H.4       PUBLIC        PS
+  D:0008H         PUBLIC        serial_one_read_data
+  D:00D8H         PUBLIC        CCON
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 3
+
+
+  C:06C1H         PUBLIC        main
+  C:08AFH         PUBLIC        _serial_one_send_string
+  D:0099H         PUBLIC        SBUF
+  C:0003H         PUBLIC        _DelayMs
+  D:0028H         PUBLIC        serial_one_read_count
+  D:0098H         PUBLIC        SCON
+  C:08F7H         PUBLIC        Delay10ms
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:088AH         PUBLIC        serial_one_init
+  D:00F0H         PUBLIC        B
+  D:008EH         PUBLIC        AUXR
+  D:00E0H         PUBLIC        ACC
+  C:0906H         PUBLIC        _serial_one_send_byte
+  D:008DH         PUBLIC        TH1
+  D:008BH         PUBLIC        TL1
+  B:0088H.6       PUBLIC        TR1
+  B:00A0H.5       PUBLIC        CLK
+  D:0029H         PUBLIC        f
+  B:0098H.4       PUBLIC        REN
+  C:090EH         PUBLIC        _DelayUs2x
+  D:00D0H         PUBLIC        PSW
+  D:002DH         PUBLIC        buffer
+  -------         PROC          SERIAL_ONE_INIT
+  C:088AH         LINE#         46
+  C:088AH         LINE#         47
+  C:088AH         LINE#         48
+  C:088DH         LINE#         49
+  C:0890H         LINE#         50
+  C:0892H         LINE#         51
+  C:0895H         LINE#         52
+  C:0898H         LINE#         53
+  C:089BH         LINE#         54
+  C:089EH         LINE#         55
+  C:08A1H         LINE#         56
+  C:08A4H         LINE#         57
+  C:08A6H         LINE#         58
+  C:08A8H         LINE#         59
+  C:08AAH         LINE#         60
+  C:08ACH         LINE#         62
+  C:08AEH         LINE#         63
+  -------         ENDPROC       SERIAL_ONE_INIT
+  -------         PROC          DELAY10MS
+  -------         DO            
+  D:0007H         SYMBOL        i
+  D:0006H         SYMBOL        j
+  D:0005H         SYMBOL        k
+  -------         ENDDO         
+  C:08F7H         LINE#         66
+  C:08F7H         LINE#         67
+  C:08F7H         LINE#         70
+  C:08F8H         LINE#         71
+  C:08F9H         LINE#         72
+  C:08FBH         LINE#         73
+  C:08FDH         LINE#         74
+  C:08FFH         LINE#         76
+  C:08FFH         LINE#         78
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 4
+
+
+  C:08FFH         LINE#         79
+  C:0901H         LINE#         80
+  C:0903H         LINE#         81
+  C:0905H         LINE#         82
+  -------         ENDPROC       DELAY10MS
+  -------         PROC          _SERIAL_ONE_SEND_BYTE
+  D:0007H         SYMBOL        dat
+  C:0906H         LINE#         85
+  C:0906H         LINE#         86
+  C:0906H         LINE#         87
+  C:0908H         LINE#         88
+  C:090BH         LINE#         89
+  C:090DH         LINE#         90
+  -------         ENDPROC       _SERIAL_ONE_SEND_BYTE
+  -------         PROC          _SERIAL_ONE_SEND_STRING
+  D:0077H         SYMBOL        dat
+  C:08AFH         LINE#         93
+  C:08B5H         LINE#         94
+  C:08B5H         LINE#         95
+  C:08C0H         LINE#         96
+  C:08D3H         LINE#         97
+  -------         ENDPROC       _SERIAL_ONE_SEND_STRING
+  -------         PROC          _SERIAL_ONE_SEND_LENGTH_STRING
+  D:007AH         SYMBOL        dat
+  D:0005H         SYMBOL        length
+  -------         DO            
+  D:0006H         SYMBOL        i
+  -------         ENDDO         
+  C:08D4H         LINE#         100
+  C:08DAH         LINE#         101
+  C:08DAH         LINE#         102
+  C:08DCH         LINE#         103
+  C:08E1H         LINE#         104
+  C:08F6H         LINE#         105
+  -------         ENDPROC       _SERIAL_ONE_SEND_LENGTH_STRING
+  -------         PROC          UART1_INT
+  C:0862H         LINE#         108
+  C:086BH         LINE#         110
+  C:086EH         LINE#         111
+  C:086EH         LINE#         112
+  C:0870H         LINE#         113
+  C:0877H         LINE#         114
+  C:0880H         LINE#         115
+  C:0883H         LINE#         116
+  C:0883H         LINE#         121
+  -------         ENDPROC       UART1_INT
+  C:07F9H         SYMBOL        L?0051
+  -------         PROC          L?0050
+  -------         ENDPROC       L?0050
+  C:07F9H         SYMBOL        L?0051
+  -------         PROC          _WRITETOADF435X
+  D:006DH         SYMBOL        BUF
+  -------         DO            
+  D:0071H         SYMBOL        i
+  D:0072H         SYMBOL        j
+  D:0073H         SYMBOL        ValueToWrite
+  -------         ENDDO         
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 5
+
+
+  C:07FDH         LINE#         125
+  C:0805H         LINE#         126
+  C:080AH         LINE#         127
+  C:0812H         LINE#         128
+  C:081AH         LINE#         129
+  C:081EH         LINE#         130
+  C:0820H         LINE#         131
+  C:0835H         LINE#         132
+  C:0839H         LINE#         133
+  C:083BH         LINE#         134
+  C:083DH         LINE#         135
+  C:0852H         LINE#         136
+  C:0854H         LINE#         137
+  C:085BH         LINE#         138
+  C:085DH         LINE#         139
+  C:0861H         LINE#         140
+  -------         ENDPROC       _WRITETOADF435X
+  -------         PROC          _WRITEFREQ
+  D:004DH         SYMBOL        Freq
+  -------         DO            
+  D:0051H         SYMBOL        Freq_temp
+  D:0055H         SYMBOL        INT
+  D:0004H         SYMBOL        FRAC
+  D:0059H         SYMBOL        MODE
+  D:005DH         SYMBOL        R0_temp
+  D:0061H         SYMBOL        R4_temp
+  D:0065H         SYMBOL        Out_Divider
+  D:0069H         SYMBOL        RF_Divider
+  -------         ENDDO         
+  C:03FBH         LINE#         141
+  C:0403H         LINE#         142
+  C:0403H         LINE#         143
+  C:040EH         LINE#         144
+  C:0416H         LINE#         145
+  C:041EH         LINE#         147
+  C:0453H         LINE#         148
+  C:0492H         LINE#         149
+  C:04D1H         LINE#         150
+  C:0510H         LINE#         151
+  C:054FH         LINE#         152
+  C:058EH         LINE#         153
+  C:05CCH         LINE#         155
+  C:05EBH         LINE#         156
+  C:05F4H         LINE#         158
+  C:0608H         LINE#         159
+  C:0632H         LINE#         160
+  C:0641H         LINE#         161
+  C:067DH         LINE#         162
+  C:06BBH         LINE#         163
+  -------         ENDPROC       _WRITEFREQ
+  -------         PROC          MAIN
+  C:06C1H         LINE#         168
+  C:06C1H         LINE#         169
+  C:06C1H         LINE#         170
+  C:06C8H         LINE#         172
+  C:06CBH         LINE#         173
+  C:06D6H         LINE#         174
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 6
+
+
+  C:06E1H         LINE#         175
+  C:06ECH         LINE#         176
+  C:06F7H         LINE#         177
+  C:06FEH         LINE#         179
+  C:0701H         LINE#         180
+  C:070CH         LINE#         181
+  C:0717H         LINE#         182
+  C:0722H         LINE#         183
+  C:072DH         LINE#         184
+  C:0738H         LINE#         186
+  C:073BH         LINE#         187
+  C:073EH         LINE#         188
+  C:0741H         LINE#         190
+  C:074CH         LINE#         191
+  C:074CH         LINE#         192
+  C:074CH         LINE#         193
+  C:0753H         LINE#         194
+  C:0753H         LINE#         195
+  C:0756H         LINE#         197
+  C:0759H         LINE#         198
+  C:0767H         LINE#         199
+  C:0767H         LINE#         200
+  -------         ENDPROC       MAIN
+  -------         PROC          _DELAYUS2X
+  D:0007H         SYMBOL        t
+  C:090EH         LINE#         211
+  C:090EH         LINE#         212
+  C:090EH         LINE#         213
+  C:0910H         LINE#         214
+  -------         ENDPROC       _DELAYUS2X
+  -------         PROC          _DELAYMS
+  D:0004H         SYMBOL        t
+  C:0003H         LINE#         220
+  C:0007H         LINE#         221
+  C:0007H         LINE#         223
+  C:0011H         LINE#         224
+  C:0011H         LINE#         226
+  C:0016H         LINE#         227
+  C:001BH         LINE#         228
+  C:001DH         LINE#         229
+  -------         ENDPROC       _DELAYMS
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        ?C?FPADD
+  C:002DH         PUBLIC        ?C?FPADD
+  C:0029H         PUBLIC        ?C?FPSUB
+  -------         ENDMOD        ?C?FPADD
+
+  -------         MODULE        ?C?FPMUL
+  C:011EH         PUBLIC        ?C?FPMUL
+  -------         ENDMOD        ?C?FPMUL
+
+  -------         MODULE        ?C?FPDIV
+  C:0227H         PUBLIC        ?C?FPDIV
+  -------         ENDMOD        ?C?FPDIV
+
+  -------         MODULE        ?C?FCAST
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/03/2018  17:22:23  PAGE 7
+
+
+  C:02CEH         PUBLIC        ?C?FCASTC
+  C:02C9H         PUBLIC        ?C?FCASTI
+  C:02C4H         PUBLIC        ?C?FCASTL
+  -------         ENDMOD        ?C?FCAST
+
+  -------         MODULE        ?C?CASTF
+  C:0302H         PUBLIC        ?C?CASTF
+  -------         ENDMOD        ?C?CASTF
+
+  -------         MODULE        ?C?CLDPTR
+  C:0383H         PUBLIC        ?C?CLDPTR
+  -------         ENDMOD        ?C?CLDPTR
+
+  -------         MODULE        ?C?CLDOPTR
+  C:039CH         PUBLIC        ?C?CLDOPTR
+  -------         ENDMOD        ?C?CLDOPTR
+
+  -------         MODULE        ?C?LNEG
+  C:03C9H         PUBLIC        ?C?LNEG
+  -------         ENDMOD        ?C?LNEG
+
+  -------         MODULE        ?C?ULCMP
+  C:03D7H         PUBLIC        ?C?ULCMP
+  -------         ENDMOD        ?C?ULCMP
+
+  -------         MODULE        ?C?LSHL
+  C:03E8H         PUBLIC        ?C?LSHL
+  -------         ENDMOD        ?C?LSHL
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SERIAL_ONE_SEND_STRING?MAIN
+
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_SERIAL_ONE_SEND_LENGTH_STRING?MAIN
+
+Program Size: data=126.0 xdata=0 code=2320
+LINK/LOCATE RUN COMPLETE.  2 WARNING(S),  0 ERROR(S)

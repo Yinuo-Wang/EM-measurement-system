@@ -1,0 +1,267 @@
+C51 COMPILER V9.00   MAIN                                                                  04/03/2018 17:22:22 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2            ADF4350/1³ÌĞò£¬±àĞ´ÈÕÆÚ20150308 £¬±àĞ´ÈË£ºÁõÌÎ
+   3            ¹¦ÄÜ£ºÊä³öÆµÂÊÎª137.5MHZµ½4.4GHZ,º¯ÊıÀïÃæÖ±½ÓĞ´£º WriteFreq(560000);µ¥Î»ÊÇKHZ£¬·Ö±æÂÊÊÇ1KHZ  ,MODE ÊÇ312
+             -5
+   4          */
+   5          
+   6          #include <STC15Fxxxx.H>
+   7          
+   8          void DelayUs2x(unsigned char t);
+   9          void DelayMs(unsigned int t);
+  10          sbit CLK=P2^5;
+  11          sbit LE=P2^2;
+  12          sbit DATA=P1^2;
+  13          //¹Ì¶¨Êä³ö137.5001MHZµÄ¼Ä´æÆ÷ÅäÖÃ
+  14          #define R0 0X2C0010
+  15          #define R1 0X800E1A9
+  16          #define R2 0X18004E42
+  17          #define R3 0X4B3
+  18          #define R4 0XCC803C
+  19          #define R5 0X580005
+  20          
+  21          //**********************************************
+  22          //STC15F2K60S2´®¿ÚÍ¨ĞÅ³ÌĞò,½«´®¿Ú½ÓÊÜµ½µÄÊı¾İ´Ó´®¿Ú·¢³öÈ¥
+  23          //²ÉÓÃ22.1184M¾§Õñ,²¨ÌØÂÊ115200
+  24          //Îª·½±ã´ó¼Òµ÷ÊÔ,ÌØ¸½¸Ã³ÌĞòµÄÏîÄ¿¹¤³ÌÎÄ¼şÏÂÔØµØÖ·,ÏÂÔØ´ò¿ª¼´¿Éµ÷ÊÔÏÂÔØµ½µ¥Æ¬»ú
+  25          //
+  26          //*********************************************
+  27          
+  28          
+  29          #include <stc15fxxxx.h>     //µ÷ÓÃstc15fÏµÁĞÍ·ÎÄ¼ş,ÏÂÔØµØÖ·: http://pan.baidu.com/s/1eRUbjLS
+  30          
+  31          /*************³£Á¿¶¨Òå****************/
+  32          
+  33          #define MAIN_Fosc                               22118400L       //Ö÷Ê±ÖÓ,¾§ÕñÆµÂÊ²»Í¬µÄÖ±½ÓÔÚÕâÀïĞŞ¸ÄÆµÂÊ
+  34          #define serial_one_read_max         32                  //¶¨Òå»º´æÇøµÄ³¤¶È
+  35          #define serial_one_baud_rate        115200L         //²¨ÌØÂÊ,Ö»ĞèÔÚÕâÀïĞŞ¸Ä²¨ÌØÂÊ¾Í¿ÉÒÔÁË
+  36          #define Timer1_Reload                       (65536UL -(MAIN_Fosc / 4 / serial_one_baud_rate))      //ÓÃ¶¨Ê
+             -±Æ÷1×ö²¨ÌØÂÊ·¢ÉúÆ÷
+  37          #define Freq_init                   1800000     
+  38          
+  39          /*************±äÁ¿¶¨Òå****************/
+  40          u8  serial_one_read_data[serial_one_read_max];  //¶¨Òå´®¿Ú½ÓÊÜÊı¾İ»º´æÇø
+  41          u8  serial_one_read_count=0;                                        //½ÓÊÜÊı¾İµÄ¸öÊı
+  42          char buffer[serial_one_read_max];//Î¬Êı¶¨ÒåĞ© 
+  43          unsigned long f; 
+  44          
+  45          //³õÊ¼»¯´®¿Ú1
+  46          void serial_one_init()
+  47          {
+  48   1          SCON |= 0x40;               //8Î»Êı¾İ
+  49   1          P_SW1 &=  ~0xc0;       //UART1 Ê¹ÓÃP30 P31¿Ú  Ä¬ÈÏ
+  50   1          TR1 = 0;                    //¹Ø±Õ¶¨Ê±Æ÷
+  51   1          AUXR &= ~0x01;     //S1 BRT Use Timer1;
+  52   1          TMOD &= ~(1<<6);   //Timer1 set As Timer
+  53   1          TMOD &= ~0x30;     //Timer1_16bitAutoReload;2
+C51 COMPILER V9.00   MAIN                                                                  04/03/2018 17:22:22 PAGE 2   
+
+  54   1          AUXR |=  (1<<6);    //Timer1 set as 1T mode
+  55   1          TH1 = (u8)(Timer1_Reload >> 8);
+  56   1          TL1 = (u8)Timer1_Reload;
+  57   1          TR1  = 1;                   //´ò¿ª¶¨Ê±Æ÷
+  58   1          PS = 1; //¸ßÓÅÏÈ¼¶ÖĞ¶Ï
+  59   1          REN = 1;    //ÔÊĞí½ÓÊÕ
+  60   1          ES  = 1;    //ÔÊĞíÖĞ¶Ï
+  61   1      
+  62   1          EA = 1;     //ÔÊĞíÈ«¾ÖÖĞ¶Ï
+  63   1      }
+  64          
+  65          //ÑÓÊ±10ºÁÃë
+  66          void Delay10ms()        //@22.1184MHz
+  67          {
+  68   1          unsigned char i, j, k;
+  69   1      
+  70   1          _nop_();
+  71   1          _nop_();
+  72   1          i = 1;
+  73   1          j = 216;
+  74   1          k = 35;
+  75   1          do
+  76   1          {
+  77   2              do
+  78   2              {
+  79   3                  while (--k);
+  80   3              } while (--j);
+  81   2          } while (--i);
+  82   1      }
+  83          
+  84          //´®¿Ú1·¢ËÍÒ»¸ö×Ö½Ú
+  85          void serial_one_send_byte(u8 dat)
+  86          {
+  87   1          SBUF = dat;//·¢ËÍÊı¾İ
+  88   1          while(!TI);//µÈ´ı·¢ËÍÍê±Ï
+  89   1          TI=0;            //Çå³ı·¢ËÍ±êÖ¾
+  90   1      }
+  91          
+  92          //´®¿Ú1·¢ËÍ×Ö·û´®
+  93          void serial_one_send_string(u8 *dat)
+  94          {
+  95   1          while(*dat)
+  96   1              serial_one_send_byte(*dat++);
+  97   1      }
+  98          
+  99          //´®¿Ú1·¢ËÍÖ¸¶¨Ö¸¶¨³¤¶ÈÊı¾İ
+ 100          void serial_one_send_length_string(u8 *dat,u8 length)
+ 101          {
+ 102   1          u8 i=0;
+ 103   1          for(;i < length;i++)
+ 104   1              serial_one_send_byte(dat[i]);
+ 105   1      }
+ 106          
+ 107          /********************* ´®¿Ú1ÖĞ¶Ïº¯Êı************************/
+ 108          void UART1_int (void) interrupt UART1_VECTOR
+ 109          {
+ 110   1          if(RI)
+ 111   1          {
+ 112   2              RI = 0;//Çå³ı½ÓÊÜ±êÖ¾
+ 113   2              serial_one_read_data[serial_one_read_count] = SBUF;//½«Êı¾İ´æÈëÊı×é
+ 114   2              if(++serial_one_read_count > serial_one_read_max)    //±ÜÃâÒç³ö
+ 115   2                  serial_one_read_count = 0;
+C51 COMPILER V9.00   MAIN                                                                  04/03/2018 17:22:22 PAGE 3   
+
+ 116   2          }
+ 117   1      
+ 118   1      //  if(TI)
+ 119   1      //  {
+ 120   1      //  }
+ 121   1      }
+ 122          
+ 123          //Function that writes to the ADF435x via the SPI port.
+ 124          //--------------------------------------------------------------------------------
+ 125          void WriteToADF435X(unsigned long BUF)
+ 126          {unsigned char i = 0,   j = 0;
+ 127   1        unsigned long ValueToWrite = 0;
+ 128   1        ValueToWrite =BUF;
+ 129   1        CLK=0;LE=0;
+ 130   1        for(j=0; j<32; j++)
+ 131   1           {if(0x80000000 == (ValueToWrite & 0x80000000))
+ 132   2             {DATA=1;}   //Send one to SDO pin
+ 133   2             else{DATA=0;}   //Send zero to SDO pin   
+ 134   2             CLK=1;
+ 135   2             ValueToWrite <<= 1; //Rotate data
+ 136   2             CLK=0;
+ 137   2            }
+ 138   1        CLK=0;
+ 139   1        LE=1;LE=0;
+ 140   1      }
+ 141          void  WriteFreq(unsigned long Freq)      //137500KHZ
+ 142          {float Freq_temp;
+ 143   1       unsigned long  INT,FRAC,MODE=3125; //ÕûÊı·ÖÆµ£¬  Ğ¡Êı·ÖÆµ   È¡Ä£Öµ         MODE=3125;  //MODE=3125£¬ÏµÍ³²ÉÓÃ25
+             -MHZ±¾Õñ£¬·Ö±æÂÊÎª1KHZ£¬×îĞ¡·Ö±æÂÊ¿ÉÒÔÎª0.5KHZ
+ 144   1       unsigned long R0_temp=0;  //¿ØÖÆINT  FRAC
+ 145   1       unsigned long R4_temp=0; //¸Ä±äÊä³öµÄ·ÖÆµ¿ØÖÆ×Ö£¬Ò»¹²·Ö³É4¶Î   2.2GHZ--4.4GHZ     1.1GHZ--2.2GHZ      550M
+             -HZ--1.1GHZ   275MHZ--550MHZ   137.5MHZ--275MHZ
+ 146   1       unsigned long  Out_Divider,RF_Divider;//Êä³ö·ÖÆµ¿ØÖÆ£¬3Î»  ¼°¶ÔÓ¦µÄ·ÖÆµÊı 
+ 147   1      if((34375<=Freq)&&(Freq<68750))  {Out_Divider=6;RF_Divider=64;}   //ADF4351²ÅÓĞ 
+ 148   1      if((68750<=Freq)&&(Freq<137500)) {Out_Divider=5;RF_Divider=32;}   //ADF4351²ÅÓĞ                           
+             -                               
+ 149   1      if((137500<=Freq)&&(Freq<275000)){Out_Divider=4;RF_Divider=16;}  //²»Í¬Æµ¶Î²ÉÓÃ²»Í¬µÄ·ÖÆµ ADF4351 50¶¼ÓĞ 
+ 150   1      if((275000<=Freq)&&(Freq<550000)){Out_Divider=3;RF_Divider=8;}
+ 151   1      if((550000<=Freq)&&(Freq<1100000)){Out_Divider=2;RF_Divider=4;}
+ 152   1      if((1100000<=Freq)&&(Freq<2200000)){Out_Divider=1;RF_Divider=2;}
+ 153   1      if((2200000<=Freq)&&(Freq<4400000)){Out_Divider=0;RF_Divider=1;}
+ 154   1      
+ 155   1        R4_temp=((R4&0XFF8FFFFF)|(Out_Divider<<20));
+ 156   1        WriteToADF435X(R4_temp);
+ 157   1       
+ 158   1       Freq_temp=Freq;   //×ª»»ÆµÂÊµÃµ½Ğ¡Êı·ÖÆµºÍÕûÊı·ÖÆµ
+ 159   1       Freq_temp=(Freq_temp*RF_Divider)/25000;
+ 160   1           INT  =(int)Freq_temp;
+ 161   1               FRAC=  (Freq_temp-INT)*MODE;
+ 162   1      R0_temp=((INT<<15)|(FRAC<<3))&0x7fffff8;
+ 163   1       WriteToADF435X(R0_temp);
+ 164   1      
+ 165   1      }
+ 166          
+ 167          
+ 168          void main(void)
+ 169          { 
+ 170   1       DelayMs(5000);
+ 171   1       //ÒÔÏÂÎª³õÊ¼»¯µÄÖµ£¬×îºÃ³õÊ¼»¯Á½´Î£¬±È½ÏÎÈ¶¨¡£
+ 172   1       WriteToADF435X(R0);
+ 173   1       WriteToADF435X(R1);
+ 174   1       WriteToADF435X(R2);
+C51 COMPILER V9.00   MAIN                                                                  04/03/2018 17:22:22 PAGE 4   
+
+ 175   1       WriteToADF435X(R3);
+ 176   1       WriteToADF435X(R4);
+ 177   1       WriteToADF435X(R5);   
+ 178   1       
+ 179   1       WriteToADF435X(R0);
+ 180   1       WriteToADF435X(R1);
+ 181   1       WriteToADF435X(R2);
+ 182   1       WriteToADF435X(R3);
+ 183   1       WriteToADF435X(R4);
+ 184   1       WriteToADF435X(R5);
+ 185   1      
+ 186   1       Delay10ms();//ÑÓÊ±10ºÁÃë
+ 187   1       Delay10ms();//ÑÓÊ±10ºÁÃë
+ 188   1       serial_one_init();//´®¿Ú³õÊ¼»¯
+ 189   1      
+ 190   1       WriteFreq(Freq_init); 
+ 191   1       while(1)
+ 192   1       {
+ 193   2          if(serial_one_read_count > 0)//Èç¹û½ÓÊÜµ½Êı¾İ
+ 194   2          {
+ 195   3            Delay10ms();//ÑÓÊ±10ºÁÃë£¬µÈ´ıÊı¾İÈ«²¿¶ÁÈë
+ 196   3            //serial_one_send_length_string(serial_one_read_data,serial_one_read_count);//·¢ËÍ½ÓÊÕµ½µÄÊı¾İ
+ 197   3            serial_one_read_count = 0;//½ÓÊÕ¼ÆÊıÇå0
+ 198   3                WriteFreq(serial_one_read_data);      //Ö±½ÓĞ´ÈëÆµÂÊÖµ£¬¾Í¿ÉÒÔµÃµ½Êä³öÆµÂÊÁË£¬µ¥Î»ÊÇKHZ
+*** WARNING C214 IN LINE 198 OF MAIN.C: 'Argument': conversion: pointer to non-pointer
+ 199   3          }
+ 200   2       }
+ 201   1      
+ 202   1      }
+ 203          
+ 204          
+ 205          /*------------------------------------------------
+ 206           uSÑÓÊ±º¯Êı£¬º¬ÓĞÊäÈë²ÎÊı unsigned char t£¬ÎŞ·µ»ØÖµ
+ 207           unsigned char ÊÇ¶¨ÒåÎŞ·ûºÅ×Ö·û±äÁ¿£¬ÆäÖµµÄ·¶Î§ÊÇ
+ 208           0~255 ÕâÀïÊ¹ÓÃ¾§Õñ22.1184M£¬¾«È·ÑÓÊ±ÇëÊ¹ÓÃ»ã±à,´óÖÂÑÓÊ±
+ 209           ³¤¶ÈÈçÏÂ T=tx2+5 uS 
+ 210          ------------------------------------------------*/
+ 211          void DelayUs2x(unsigned char t)
+ 212          {
+ 213   1       while(--t);
+ 214   1      }
+ 215          /*------------------------------------------------
+ 216           mSÑÓÊ±º¯Êı£¬º¬ÓĞÊäÈë²ÎÊı unsigned char t£¬ÎŞ·µ»ØÖµ
+ 217           unsigned char ÊÇ¶¨ÒåÎŞ·ûºÅ×Ö·û±äÁ¿£¬ÆäÖµµÄ·¶Î§ÊÇ
+ 218           0~255 ÕâÀïÊ¹ÓÃ¾§Õñ12M£¬¾«È·ÑÓÊ±ÇëÊ¹ÓÃ»ã±à
+ 219          ------------------------------------------------*/
+ 220          void DelayMs(unsigned int t)
+ 221          {
+ 222   1           
+ 223   1       while(t--)
+ 224   1       {
+ 225   2           //´óÖÂÑÓÊ±1mS
+ 226   2           DelayUs2x(245);
+ 227   2               DelayUs2x(245);
+ 228   2       }
+ 229   1      }
+ 230          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1189    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V9.00   MAIN                                                                  04/03/2018 17:22:22 PAGE 5   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     69      48
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
